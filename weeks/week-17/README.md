@@ -1,35 +1,76 @@
-# Финальный проект
+# tasks-s22
 
-## Задача
-Поздравляем! Вы дошли до финала. Теперь у вас есть набор знаний, который необходимо объединить в общую картину: REST, gRPC, Docker, K8s, CI/CD.
-Пришло время собрать всё это вместе в один финальный проект.
+Сервис управления задачами. Группа 331, студент s22.
 
-## Ваш вариант
-`variants/<GROUP>/<STUDENT_ID>/week-17.json`
-Там описана тема вашего проекта (например, "Сервис доставки еды" или "Трекер задач").
+## Что это?
 
-## Что нужно сделать
-1. **Архитектура**:
-   - Спроектируйте систему из 2-3 микросервисов.
-   - Опишите её в `ARCHITECTURE.md` (кто с кем общается, какие базы данных, какие протоколы).
-2. **Реализация**:
-   - Напишите код сервисов (можно переиспользовать код с прошлых недель).
-   - Выберите протокол осознанно: где-то REST для фронтенда, где-то gRPC для межсервисного общения.
-3. **Инфраструктура**:
-   - Упакуйте всё в Docker.
-   - Напишите docker-compose для локального запуска.
-   - (Опционально) Helm чарт для Кубернетиса.
-   - Настройте (или опишите) CI пайплайн.
-4. **Сдача**:
-   - Проект должен запускаться одной командой и иметь документацию.
+REST API для работы со списком задач (CRUD). Поле `due` — срок выполнения.
 
-## Что сдавать
-1. Полный код проекта.
-2. `ARCHITECTURE.md`.
-3. Инструкция по запуску.
+## Архитектура
 
-## Как проверить
+- **gateway** — REST-фасад на FastAPI, порт `8236`
+- **tasks-svc** — gRPC-сервис с SQLite, порт `50051` (внутренний)
+
+Подробнее: [ARCHITECTURE.md](ARCHITECTURE.md)
+
+## Как запустить
+
 ```bash
-make test WEEK=17
+git clone <repo>
+cd tasks-s22
+docker compose up --build
 ```
-Тест проверит наличие основных файлов и документации.
+
+Готово. API доступно на `http://localhost:8236`.
+
+## Примеры запросов
+
+```bash
+# Создать задачу
+curl -X POST http://localhost:8236/api/tasks \
+  -H "Content-Type: application/json" \
+  -d '{"title": "Сдать проект", "due": "2025-06-01"}'
+
+# Список задач
+curl http://localhost:8236/api/tasks
+
+# Обновить задачу
+curl -X PUT http://localhost:8236/api/tasks/1 \
+  -H "Content-Type: application/json" \
+  -d '{"title": "Сдать проект", "due": "2025-06-01", "done": true}'
+
+# Удалить задачу
+curl -X DELETE http://localhost:8236/api/tasks/1
+```
+
+## Swagger UI
+
+`http://localhost:8236/docs`
+
+## Структура проекта
+
+```
+tasks-s22/
+├── proto/
+│   └── tasks.proto          # gRPC-контракт
+├── tasks-svc/
+│   ├── main.py              # gRPC-сервер
+│   ├── tasks_pb2.py         # сгенерировано из proto
+│   ├── tasks_pb2_grpc.py    # сгенерировано из proto
+│   ├── requirements.txt
+│   └── Dockerfile
+├── gateway/
+│   ├── main.py              # FastAPI REST → gRPC
+│   ├── tasks_pb2.py         # сгенерировано из proto
+│   ├── tasks_pb2_grpc.py    # сгенерировано из proto
+│   ├── requirements.txt
+│   └── Dockerfile
+├── k8s/
+│   ├── tasks-svc.yaml
+│   └── gateway.yaml
+├── .github/workflows/
+│   └── ci.yml
+├── docker-compose.yml
+├── ARCHITECTURE.md
+└── README.md
+```

@@ -1,42 +1,43 @@
-name: ci
+name: CI
 
 on:
   push:
   pull_request:
 
 jobs:
-  tests:
+  test:
     runs-on: ubuntu-latest
+
     env:
-      WEEK: "04"
+      WEEK: "14"
       GROUP: "331"
       STUDENT_ID: "s22"
-      IMAGE_NAME: "В этом месте вам необходимо"
+      PROJECT_CODE: logs-s22
+
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-python@v5
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
         with:
-          python-version: '3.11'
-          cache: 'pip'
-      - name: Установка зависимостей
+          python-version: "3.11"
+          cache: "pip"
+
+      - name: Install dependencies
         run: |
-          python -m pip install --upgrade pip
           pip install -r requirements.txt
-      - name: Линтер (необязательно)
+
+      - name: Run tests
         run: |
-          echo "В этом месте вам необходимо: добавить шаг линтера (ruff/flake8)"
-      - name: Запуск тестов
-        run: make test WEEK=${{ env.WEEK }}
-      - name: Сборка Docker-образа
+          make test WEEK=14
+
+      - name: Build Docker image
         run: |
-          docker build -t $IMAGE_NAME -f weeks/week-10/Dockerfile weeks/week-10
-      - name: Подготовка артефактов
-        run: |
-          mkdir -p artifacts
-          cp weeks/week-10/report.md artifacts/ || true
-          cp weeks/week-14/README.md artifacts/ || true
-      - name: Публикация артефактов
+          docker build -t logs-s22 .
+
+      - name: Save artifact
         uses: actions/upload-artifact@v4
         with:
-          name: build-artifacts
-          path: artifacts
+          name: logs-s22-artifact
+          path: .

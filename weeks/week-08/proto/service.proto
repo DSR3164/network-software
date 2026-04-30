@@ -1,0 +1,40 @@
+syntax = "proto3";
+
+package tasks.v1;
+
+service TasksService {
+
+  // unary
+  rpc GetTask (GetTaskRequest) returns (Task);
+
+  rpc CreateTask (CreateTaskRequest) returns (Task);
+
+  // server streaming (сервер шлёт поток задач)
+  rpc ListTasks (ListTasksRequest) returns (stream Task);
+
+  // client streaming (клиент шлёт поток задач)
+  rpc UploadTasks (stream CreateTaskRequest) returns (UploadResponse);
+
+  // bidirectional streaming (чат-подобный режим)
+  rpc SyncTasks (stream Task) returns (stream Task);
+}
+
+message Task {
+  int32 id = 1;
+  string due = 2;
+}
+
+message GetTaskRequest {
+  int32 id = 1;
+}
+
+message ListTasksRequest {}
+
+message CreateTaskRequest {
+  string due = 1;
+}
+
+message UploadResponse {
+  string status = 1;
+  int32 received = 2;
+}

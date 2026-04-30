@@ -1,1 +1,47 @@
 # В этом месте вам необходимо: Deployment
+apiVersion: apps/v1
+kind: Deployment
+
+metadata:
+  name: logs-app
+
+spec:
+  replicas: 1
+
+  selector:
+    matchLabels:
+      app: logs-app
+
+  template:
+    metadata:
+      labels:
+        app: logs-app
+
+    spec:
+      containers:
+        - name: logs-container
+          image: logs-image:latest
+          ports:
+            - containerPort: 8119
+
+          resources:
+            requests:
+              cpu: "100m"
+              memory: "128Mi"
+            limits:
+              cpu: "500m"
+              memory: "256Mi"
+
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: 8119
+            initialDelaySeconds: 5
+            periodSeconds: 10
+
+          readinessProbe:
+            httpGet:
+              path: /health
+              port: 8119
+            initialDelaySeconds: 3
+            periodSeconds: 5

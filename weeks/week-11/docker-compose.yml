@@ -1,22 +1,30 @@
-version: '3.9'
+version: "3.9"
+
 services:
-  app:
-    # Замените на имя образа
-    image: primer/obraz
+  items-svc-s22:
+    build: .
+    container_name: items-svc-s22
+    ports:
+      - "8181:8181"
+    environment:
+      - PROJECT_CODE=items-s22
     healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
+      test: ["CMD", "curl", "-f", "http://localhost:8181/health"]
       interval: 10s
-      timeout: 3s
+      timeout: 5s
       retries: 3
     networks:
       - app-net
+
   gateway:
-    # Замените на имя образа
-    image: primer/obraz
+    image: nginx:alpine
     depends_on:
-      - app
+      - items-svc-s22
+    ports:
+      - "8080:80"
     networks:
       - app-net
+
 networks:
   app-net:
     driver: bridge

@@ -1,3 +1,13 @@
-# Audit
+## Security audit report
 
-В этом документе вам необходимо заполнить аудит.
+Project: products-s22
+
+### Findings
+
+- Broken Access Control risk: validate user ownership
+- Injection risk: sanitize all inputs
+- Sensitive data must not be stored in plaintext
+
+### Conclusion
+
+System follows Zero Trust principle.

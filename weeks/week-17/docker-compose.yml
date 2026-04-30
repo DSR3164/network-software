@@ -1,0 +1,24 @@
+services:
+
+  tasks-svc:
+    build: ./tasks-svc
+    container_name: tasks-svc-s22
+    volumes:
+      - tasks-data:/data
+    expose:
+      - "50051"
+    restart: unless-stopped
+
+  gateway:
+    build: ./gateway
+    container_name: gateway-s22
+    ports:
+      - "8236:8236"
+    environment:
+      TASKS_SVC_ADDR: tasks-svc:50051
+    depends_on:
+      - tasks-svc
+    restart: unless-stopped
+
+volumes:
+  tasks-data:

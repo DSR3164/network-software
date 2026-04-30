@@ -1,0 +1,38 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: tasks-app
+  labels:
+    app: tasks-app
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: tasks-app
+  template:
+    metadata:
+      labels:
+        app: tasks-app
+    spec:
+      containers:
+        - name: tasks-container
+          image: tasks-svc-s22:latest
+          ports:
+            - containerPort: 50051
+          volumeMounts:
+            - name: tasks-data
+              mountPath: /data
+      volumes:
+        - name: tasks-data
+          emptyDir: {}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: tasks-svc
+spec:
+  selector:
+    app: tasks-app
+  ports:
+    - port: 50051
+      targetPort: 50051

@@ -1,6 +1,3 @@
 apiVersion: v2
-name: zamenite-na-k8s-app
-description: Пример чарта
-type: application
+name: products-app
 version: 0.1.0
-appVersion: "1.0"

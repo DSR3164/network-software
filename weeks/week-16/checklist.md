@@ -1,3 +1,7 @@
-# Checklist
+## Security checklist
 
-В этом документе вам необходимо заполнить чек-лист.
+- Validate all input
+- Use authentication
+- Use authorization
+- Protect against injection
+- Secure storage of secrets

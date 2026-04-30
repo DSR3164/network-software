@@ -1,6 +1,8 @@
 replicaCount: 1
+
 image:
-  repository: primer/obraz
-  tag: "latest"
+  repository: products-image
+  tag: latest
+
 service:
-  port: 8000
+  port: 8243

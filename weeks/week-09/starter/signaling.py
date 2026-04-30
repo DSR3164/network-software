@@ -1,21 +1,24 @@
 import asyncio
 import websockets
+import json
 
 # Простой Signaling сервер для WebRTC
 # Он должен пересылать сообщения от одного клиента всем остальным (или конкретному собеседнику)
 
 CONNECTIONS = set()
 
-async def handler(websocket):
-    CONNECTIONS.add(websocket)
+async def handler(ws):
+    CONNECTIONS.add(ws)
     try:
-        async for message in websocket:
-            # Рассылаем сообщение всем остальным подключенным клиентам
-            for conn in CONNECTIONS:
-                if conn != websocket:
-                    await conn.send(message)
+        async for msg in ws:
+            data = json.loads(msg)
+
+            for c in CONNECTIONS:
+                if c != ws:
+                    await c.send(json.dumps(data))
+
     finally:
-        CONNECTIONS.remove(websocket)
+        CONNECTIONS.remove(ws)
 
 async def main():
     async with websockets.serve(handler, "localhost", 8765):

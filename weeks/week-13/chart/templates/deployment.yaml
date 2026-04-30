@@ -1,24 +1,32 @@
 apiVersion: apps/v1
 kind: Deployment
+
 metadata:
-  name: {{ .Chart.Name }}
-  labels:
-    app: {{ .Chart.Name }}
+  name: {{ .Values.name | default "products-app" }}
+
 spec:
   replicas: {{ .Values.replicaCount }}
+
   selector:
     matchLabels:
-      app: {{ .Chart.Name }}
+      app: products-app
+
   template:
     metadata:
       labels:
-        app: {{ .Chart.Name }}
+        app: products-app
+
     spec:
       containers:
-        - name: {{ .Chart.Name }}
+        - name: products-container
           image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
           ports:
             - containerPort: {{ .Values.service.port }}
-          env:
-            - name: APP_PORT
-              value: "{{ .Values.service.port }}"
+
+          resources:
+            requests:
+              cpu: "100m"
+              memory: "128Mi"
+            limits:
+              cpu: "500m"
+              memory: "256Mi"

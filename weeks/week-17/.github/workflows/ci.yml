@@ -1,0 +1,42 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install gateway deps
+        run: pip install -r gateway/requirements.txt
+
+      - name: Lint gateway
+        run: python -m py_compile gateway/main.py && echo "gateway OK"
+
+      - name: Install tasks-svc deps
+        run: pip install -r tasks-svc/requirements.txt
+
+      - name: Lint tasks-svc
+        run: python -m py_compile tasks-svc/main.py && echo "tasks-svc OK"
+
+      - name: Build Docker images
+        run: docker compose build
+
+      - name: Smoke test
+        run: |
+          docker compose up -d
+          sleep 5
+          curl --fail http://localhost:8236/health
+          docker compose down

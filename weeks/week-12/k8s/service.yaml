@@ -1,1 +1,17 @@
 # В этом месте вам необходимо: Service
+apiVersion: v1
+kind: Service
+
+metadata:
+  name: logs-app
+
+spec:
+  selector:
+    app: logs-app
+
+  ports:
+    - protocol: TCP
+      port: 8119
+      targetPort: 8119
+
+  type: ClusterIP
